@@ -19,7 +19,7 @@ define([], function () {
             title: {
               text: 'Measure'
             },
-            alignTicks: false
+            // alignTicks: false
 
           }, { // seconday axis
             min: 0,
@@ -29,7 +29,8 @@ define([], function () {
             title: {
               text: 'Social'
             },
-            opposite: true
+            opposite: true,
+            // alignTicks: false
           }
         ],
         legend: {enabled: false},
@@ -79,6 +80,7 @@ define([], function () {
         }, redraw);
         if (element.yAxis === 1) {
           self.chart.yAxis[1].update({
+            max: 100
             // max: 100 // always know the max
           })
         }
