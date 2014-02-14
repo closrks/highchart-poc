@@ -4,13 +4,13 @@ define(['js/highchartsView.js'], function (HighchartsView) {
     // variables
     var seriesCollection = [];
 
-    function makeNewValues(years) {
+    function makeNewValues(years, multiplier) {
       var values = [];  
       for (var i = 0, len = years*365; i < len; i++) {
         var tempDate = new Date(24*1000*3600*(i+1))
         values.push([
             Date.UTC(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate()),
-            (Math.random() * 100)
+            (Math.random() * multiplier)
           ]);
       }
       return values;
