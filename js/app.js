@@ -1,6 +1,6 @@
 define(['js/highchartsView.js'], function (HighchartsView) {
   
-  function createFakeDataHighchart(num, yr, name) {
+  function createFakeDataHighchart(num, yr, name, multiplier) {
     // variables
     var seriesCollection = [];
 
@@ -20,7 +20,7 @@ define(['js/highchartsView.js'], function (HighchartsView) {
     for (var i = 0; i < num; i++) {
       seriesCollection.push({
         name: 'series' + name,
-        data: makeNewValues(yr ? yr : 1)
+        data: makeNewValues(yr ? yr : 1, multiplier)
       });
     }
 
@@ -39,14 +39,29 @@ define(['js/highchartsView.js'], function (HighchartsView) {
 
   var name = 0;
   $('#addMeasure').click(function (e) {
-    var measure = createFakeDataHighchart(1,1, name)[0];
+    var measure = createFakeDataHighchart(1,1, name++, 100)[0];
 
     var chartMeasure = JSON.parse(JSON.stringify(measure));
     chartMeasure.uid = Date.now().toString();
-    chartMeasure.yAxis = name++ %2;
+    chartMeasure.yAxis = 0;
 
     chartView1.addMeasure(chartMeasure);
     $('body').append('<button class="removeMeasure" id="' + chartMeasure.uid + '">Click to Remove Measure ' + chartMeasure.name + '</button>')
+    $('#' + chartMeasure.uid).click(function (e) {
+      chartView1.removeMeasure(chartMeasure);
+      this.remove();
+    });
+  });
+
+  $('#addDachis').click(function (e) {
+    var measure = createFakeDataHighchart(1,1, name++, 586461613)[0];
+
+    var chartMeasure = JSON.parse(JSON.stringify(measure));
+    chartMeasure.uid = Date.now().toString();
+    chartMeasure.yAxis = 1;
+
+    chartView1.addMeasure(chartMeasure);
+    $('body').append('<button class="removeMeasure" id="' + chartMeasure.uid + '">Click to Remove Dachis ' + chartMeasure.name + '</button>')
     $('#' + chartMeasure.uid).click(function (e) {
       chartView1.removeMeasure(chartMeasure);
       this.remove();

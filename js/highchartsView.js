@@ -165,6 +165,28 @@ define([], function () {
           ;
       }
 
+
+      // hide / show right axis based on count
+      if (self.axesCollection[1].count === 0) {
+        self.axesCollection[1].min = 0;
+        self.axesCollection[1].max = 0;
+        self.chart.yAxis[1].update({
+          labels: {
+            enabled: false
+          },
+          min: 0,
+          max: 0
+        });
+      } else {
+        self.chart.yAxis[1].update({
+          labels: {
+            enabled: true
+          },
+          min: self.axesCollection[1].min,
+          max: self.axesCollection[1].max,
+          alignTicks: false
+        });
+      }
       // hide / show left axis based on count
       if (self.axesCollection[0].count === 0) {
         self.axesCollection[0].min = 0;
@@ -172,7 +194,9 @@ define([], function () {
         self.chart.yAxis[0].update({
           labels: {
             enabled: false
-          }
+          },
+          min: 0,
+          max: 0
         });
       } else {
         self.chart.yAxis[0].update({
@@ -184,24 +208,7 @@ define([], function () {
         });
       }
 
-      // hide / show right axis based on count
-      if (self.axesCollection[1].count === 0) {
-        self.axesCollection[1].min = 0;
-        self.axesCollection[1].max = 0;
-        self.chart.yAxis[1].update({
-          labels: {
-            enabled: false
-          }
-        });
-      } else {
-        self.chart.yAxis[1].update({
-          labels: {
-            enabled: true
-          },
-          min: self.axesCollection[1].min,
-          max: self.axesCollection[1].max
-        });
-      }
+      console.log(self.axesCollection)
 
       return this;
     }
