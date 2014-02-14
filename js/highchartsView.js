@@ -5,7 +5,9 @@ define([], function () {
     initialize: function (config) {
       // default configuration
       this.config = {
-        chart: {},
+        chart: {
+          zoomType: 'xy'
+        },
         xAxis: {
           type: 'datetime'
         },
@@ -14,20 +16,20 @@ define([], function () {
             min: 0,
             max: 100,
             labels: {
-              enabled: true
+              enabled: false
             },
             title: {
-              text: 'Measure'
+              text: ''
             },
             // alignTicks: false
 
           }, { // seconday axis
             min: 0,
             labels: {
-              enabled: true
+              enabled: false
             },
             title: {
-              text: 'Social'
+              text: ''
             },
             opposite: true,
             // alignTicks: false
@@ -42,6 +44,7 @@ define([], function () {
       }
 
       this.measureCollection = [];
+      this.axesCollection = [{id: 0, count: 0, min: 0, max: 0}, {id: 1, count: 0, min: 0, max: 0}];
 
       return this;
     },
@@ -72,18 +75,19 @@ define([], function () {
       // reference funcitons
       var self = this;
       var addSeriesToChart = function (element, index, array) {
+        // keep track of measures
         self.measureCollection.push(element);
+
+        // add series to highchart
         self.chart.addSeries({
           name: element.name,
           data: element.data,
           yAxis: element.yAxis
         }, redraw);
-        if (element.yAxis === 1) {
-          self.chart.yAxis[1].update({
-            max: 100
-            // max: 100 // always know the max
-          })
-        }
+
+        // count those linked to axis
+        var axis = _.findWhere(self.axesCollection, {id: element.yAxis});
+        axis.count++;
       }
 
       // apply
@@ -92,6 +96,8 @@ define([], function () {
       } else {
         addSeriesToChart(measure);
       }
+
+      self.updateAxes();
 
       return this;
     },
@@ -120,8 +126,13 @@ define([], function () {
         }
 
         if (measureFound) {
+          // remove measures from view and highchart
           self.measureCollection.splice(measureIndex, 1);
           self.chart.series[measureIndex].remove(redraw);
+
+          // count those linked to axis
+          var axis = _.findWhere(self.axesCollection, {id: element.yAxis});
+          axis.count--;
         }
 
       }
@@ -131,6 +142,65 @@ define([], function () {
         measure.forEach(removeSeriesFromChart);
       } else {
         removeSeriesFromChart(measure);
+      }
+
+      self.updateAxes();
+
+      return this;
+    },
+
+    updateAxes: function () {
+
+      var self = this;
+      
+      // update min/max
+      for (var i = 0; i < self.measureCollection.length; i++) {
+        self.axesCollection[self.measureCollection[i].yAxis].min = self.axesCollection[self.measureCollection[i].yAxis].min < self.chart.series[i].dataMin 
+          ? self.axesCollection[self.measureCollection[i].yAxis].min
+          : self.chart.series[i].dataMin
+          ;
+        self.axesCollection[self.measureCollection[i].yAxis].max = self.axesCollection[self.measureCollection[i].yAxis].max > self.chart.series[i].dataMax 
+          ? self.axesCollection[self.measureCollection[i].yAxis].max
+          : self.chart.series[i].dataMax
+          ;
+      }
+
+      // hide / show left axis based on count
+      if (self.axesCollection[0].count === 0) {
+        self.axesCollection[0].min = 0;
+        self.axesCollection[0].max = 0;
+        self.chart.yAxis[0].update({
+          labels: {
+            enabled: false
+          }
+        });
+      } else {
+        self.chart.yAxis[0].update({
+          labels: {
+            enabled: true
+          },
+          min: self.axesCollection[0].min,
+          max: self.axesCollection[0].max
+        });
+      }
+
+      // hide / show right axis based on count
+      if (self.axesCollection[1].count === 0) {
+        self.axesCollection[1].min = 0;
+        self.axesCollection[1].max = 0;
+        self.chart.yAxis[1].update({
+          labels: {
+            enabled: false
+          }
+        });
+      } else {
+        self.chart.yAxis[1].update({
+          labels: {
+            enabled: true
+          },
+          min: self.axesCollection[1].min,
+          max: self.axesCollection[1].max
+        });
       }
 
       return this;
