@@ -61,6 +61,11 @@ define([], function () {
       return this;
     },
 
+    reflowChart: function() {
+      this.chart.reflow();
+      return this;
+    },
+
     addMeasure: function (measure, redraw) {
       // no measures
       if (measure === null || measure === undefined) {
